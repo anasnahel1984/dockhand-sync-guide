@@ -1,0 +1,14 @@
+[Unit]
+Description=Dockhand to GitHub Sync Service
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/dockhand-sync-guide
+ExecStart=/bin/bash /home/ubuntu/dockhand-sync-guide/sync_dockhand.sh
+Restart=always
+RestartSec=300
+
+[Install]
+WantedBy=multi-user.target

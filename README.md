@@ -63,7 +63,7 @@ Untuk mencapai sinkronisasi dua arah, kita dapat menerapkan solusi kustom yang m
     **Contoh Skrip Bash Sederhana (untuk dijalankan sebagai Cron Job di Host):**
 
     ```bash
-    #!/bin/bash
+    #!/bash/bash
 
     DOCKHAND_CONFIG_DIR="/path/to/your/dockhand/data"
     GIT_REPO_DIR="/path/to/local/git/repo"
@@ -107,7 +107,43 @@ Untuk mencapai sinkronisasi dua arah, kita dapat menerapkan solusi kustom yang m
         */5 * * * * /path/to/your/sync_script.sh
         ```
 
-Dengan konfigurasi ini, setiap perubahan yang Anda buat di Dockhand (misalnya, menambahkan *stack* baru, mengubah konfigurasi *stack*) akan secara otomatis didorong ke repositori GitHub Anda, menciptakan sinkronisasi dua arah.
+## 3. Sinkronisasi Otomatis dari `/opt/dockhand/repo` ke GitHub
+
+Jika Anda ingin menyinkronkan file spesifik dari direktori `/opt/dockhand/repo` (tempat Dockhand menyimpan repositori lokal) ke GitHub, Anda dapat menggunakan skrip otomatisasi yang disediakan.
+
+### 3.1. Persiapan Skrip
+
+1.  **Unduh Skrip**: Gunakan skrip `sync_dockhand.sh` yang tersedia di repositori ini.
+2.  **Berikan Izin Eksekusi**:
+    ```bash
+    chmod +x sync_dockhand.sh
+    ```
+3.  **Sesuaikan Konfigurasi**: Buka skrip dan pastikan `GITHUB_REPO_URL` mengarah ke repositori tujuan Anda (misalnya repositori `app`).
+
+### 3.2. Menjalankan sebagai Layanan (Systemd)
+
+Agar sinkronisasi berjalan terus-menerus di latar belakang, Anda bisa menginstalnya sebagai layanan systemd:
+
+1.  Salin file layanan:
+    ```bash
+    sudo cp dockhand-sync.service /etc/systemd/system/
+    ```
+2.  Muat ulang daemon dan aktifkan layanan:
+    ```bash
+    sudo systemctl daemon-reload
+    sudo systemctl enable dockhand-sync.service
+    sudo systemctl start dockhand-sync.service
+    ```
+
+Layanan ini akan menjalankan skrip sinkronisasi setiap 5 menit (300 detik) secara otomatis.
+
+### 3.3. Alternatif: Menggunakan Cron
+
+Jika Anda lebih suka menggunakan Cron, tambahkan baris berikut ke crontab Anda (`crontab -e`):
+
+```bash
+*/5 * * * * /bin/bash /home/ubuntu/dockhand-sync-guide/sync_dockhand.sh >> /home/ubuntu/sync.log 2>&1
+```
 
 ## Referensi
 
